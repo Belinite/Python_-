@@ -1,0 +1,9 @@
+1)В файле BD данные, которые надо вставить в базу данных 
+2)Скрипт срабатывает при изменении файла "Тестовая выборка" с помощью nncron 
+скрипт из nncron:
+WatchFile: "C:\Users\user\Desktop\питон сайт\Тестовая_выборка.csv"
+Action:
+StartIn: "C:\Users\user\PycharmProjects\bank" 
+ShowNormal   NormalPriority
+START-APP: C:\Users\user\PycharmProjects\bank\search.py
+3) определить максимальное количество этажей для каждого Материал несущих стен в каждом городе не смогла реализовать
