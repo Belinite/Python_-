@@ -1,0 +1,96 @@
+--создание таблицы для заполнения адресами
+create table for_search( 
+		kindPremises varchar(100), 
+		Address_PostCode numeric(10), 
+		Address_Region varchar (200), 
+		Address_TypeCity varchar(200), 
+		Address_City varchar (200), 
+		Address_TypeStreet varchar(200), 
+		Address_Street varchar(200), 
+		Address_House varchar (200), 
+		Address_Block varchar (200), 
+		Address_Flat varchar(200), 
+		Address varchar (200)) 
+
+--заполнение таблицы исходным файлом
+CREATE PROCEDURE insert_into_search as
+begin
+BULK INSERT for_search 
+FROM 'C:\Users\user\Desktop\сайт питон\Тестовая_выборка.csv' 
+WITH 
+( 
+FIELDTERMINATOR =';', 
+ROWTERMINATOR = '\n', 
+FIRSTROW = 2)
+end
+exec insert_into_search
+
+
+CREATE PROCEDURE delete_from_for_search as
+	begin
+	delete from for_search
+	end
+exec  delete_from_for_search
+
+--создание таблицы для выходных файлов
+create table results_of_search(
+	Year_of_operation varchar(200),
+	Floor_of_house varchar(200),
+	Type_of_building varchar(200),
+	Type_of_house varchar(200),
+	Accident varchar(200),
+	Floor_type varchar(200),
+	Material_of_bearing_walls varchar(200),
+	Cadastral_number varchar(200),
+	Last_Update varchar (200)
+	)
+
+	select * from results_of_search
+	drop table results_of_search
+--заполнение таблицы для выходных данных
+
+CREATE PROCEDURE insert_into_result as
+	begin
+	BULK INSERT results_of_search 
+	FROM 'C:\Users\user\Desktop\сайт питон\r.csv' 
+	WITH 
+	( 
+	FIELDTERMINATOR =',', 
+	ROWTERMINATOR = '\n',
+	datafiletype = 'widechar')
+	end
+ exec insert_into_result
+
+--
+CREATE PROCEDURE delete_from_results as
+	begin
+	delete from results_of_search
+	end
+
+exec  delete_from_results
+
+	--процедура по определению количества найденных и не найденных объектов
+		CREATE PROCEDURE show_results_of_search 
+		AS DECLARE @found Int, @not_found INT, @quantity INT
+		BEGIN
+		SELECT @found = count(*) from results_of_search WHERE Year_of_operation != 'Неверный адрес'
+		print 'Количество найденных объектов'+STR(@found)
+		SELECT @quantity = count(*) from for_search
+		SET @not_found = @quantity-@found
+		print 'Количество не найденных объектов'+STR(@not_found)
+		END
+		exec show_results_of_search
+
+
+--создание таблицы для запросов
+		create view new_table as with Search as(select ROW_NUMBER() over (ORDER BY (SELECT NULL)) row_n, * from for_search),
+		Result as(select ROW_NUMBER() over (ORDER BY (SELECT NULL)) as row_n, *  from results_of_search)
+		select Address_City,Address_Region,Material_of_bearing_walls,Floor_of_house from Search f full outer join Result r on f.row_n = r.row_n
+		select * from new_table
+		
+		
+
+
+
+
+	
