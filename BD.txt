@@ -1,4 +1,4 @@
---создание таблицы для заполнения адресами
+--Г±Г®Г§Г¤Г Г­ГЁГҐ ГІГ ГЎГ«ГЁГ¶Г» Г¤Г«Гї Г§Г ГЇГ®Г«Г­ГҐГ­ГЁГї Г Г¤Г°ГҐГ±Г Г¬ГЁ
 create table for_search( 
 		kindPremises varchar(100), 
 		Address_PostCode numeric(10), 
@@ -12,27 +12,26 @@ create table for_search(
 		Address_Flat varchar(200), 
 		Address varchar (200)) 
 
---заполнение таблицы исходным файлом
+--Г§Г ГЇГ®Г«Г­ГҐГ­ГЁГҐ ГІГ ГЎГ«ГЁГ¶Г» ГЁГ±ГµГ®Г¤Г­Г»Г¬ ГґГ Г©Г«Г®Г¬
 CREATE PROCEDURE insert_into_search as
 begin
 BULK INSERT for_search 
-FROM 'C:\Users\user\Desktop\сайт питон\Тестовая_выборка.csv' 
+FROM 'C:\Users\user\Desktop\Г±Г Г©ГІ ГЇГЁГІГ®Г­\Г’ГҐГ±ГІГ®ГўГ Гї_ГўГ»ГЎГ®Г°ГЄГ .csv' 
 WITH 
 ( 
 FIELDTERMINATOR =';', 
 ROWTERMINATOR = '\n', 
 FIRSTROW = 2)
 end
-exec insert_into_search
 
 
 CREATE PROCEDURE delete_from_for_search as
 	begin
 	delete from for_search
 	end
-exec  delete_from_for_search
 
---создание таблицы для выходных файлов
+
+--Г±Г®Г§Г¤Г Г­ГЁГҐ ГІГ ГЎГ«ГЁГ¶Г» Г¤Г«Гї ГўГ»ГµГ®Г¤Г­Г»Гµ ГґГ Г©Г«Г®Гў
 create table results_of_search(
 	Year_of_operation varchar(200),
 	Floor_of_house varchar(200),
@@ -44,22 +43,18 @@ create table results_of_search(
 	Cadastral_number varchar(200),
 	Last_Update varchar (200)
 	)
-
-	select * from results_of_search
-	drop table results_of_search
---заполнение таблицы для выходных данных
+--Г§Г ГЇГ®Г«Г­ГҐГ­ГЁГҐ ГІГ ГЎГ«ГЁГ¶Г» Г¤Г«Гї ГўГ»ГµГ®Г¤Г­Г»Гµ Г¤Г Г­Г­Г»Гµ
 
 CREATE PROCEDURE insert_into_result as
 	begin
 	BULK INSERT results_of_search 
-	FROM 'C:\Users\user\Desktop\сайт питон\r.csv' 
+	FROM 'C:\Users\user\Desktop\Г±Г Г©ГІ ГЇГЁГІГ®Г­\r.csv' 
 	WITH 
 	( 
 	FIELDTERMINATOR =',', 
 	ROWTERMINATOR = '\n',
 	datafiletype = 'widechar')
 	end
- exec insert_into_result
 
 --
 CREATE PROCEDURE delete_from_results as
@@ -67,22 +62,20 @@ CREATE PROCEDURE delete_from_results as
 	delete from results_of_search
 	end
 
-exec  delete_from_results
 
-	--процедура по определению количества найденных и не найденных объектов
+	--ГЇГ°Г®Г¶ГҐГ¤ГіГ°Г  ГЇГ® Г®ГЇГ°ГҐГ¤ГҐГ«ГҐГ­ГЁГѕ ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ  Г­Г Г©Г¤ГҐГ­Г­Г»Гµ ГЁ Г­ГҐ Г­Г Г©Г¤ГҐГ­Г­Г»Гµ Г®ГЎГєГҐГЄГІГ®Гў
 		CREATE PROCEDURE show_results_of_search 
 		AS DECLARE @found Int, @not_found INT, @quantity INT
 		BEGIN
-		SELECT @found = count(*) from results_of_search WHERE Year_of_operation != 'Неверный адрес'
-		print 'Количество найденных объектов'+STR(@found)
+		SELECT @found = count(*) from results_of_search WHERE Year_of_operation != 'ГЌГҐГўГҐГ°Г­Г»Г© Г Г¤Г°ГҐГ±'
+		print 'ГЉГ®Г«ГЁГ·ГҐГ±ГІГўГ® Г­Г Г©Г¤ГҐГ­Г­Г»Гµ Г®ГЎГєГҐГЄГІГ®Гў'+STR(@found)
 		SELECT @quantity = count(*) from for_search
 		SET @not_found = @quantity-@found
-		print 'Количество не найденных объектов'+STR(@not_found)
+		print 'ГЉГ®Г«ГЁГ·ГҐГ±ГІГўГ® Г­ГҐ Г­Г Г©Г¤ГҐГ­Г­Г»Гµ Г®ГЎГєГҐГЄГІГ®Гў'+STR(@not_found)
 		END
-		exec show_results_of_search
 
 
---создание таблицы для запросов
+--Г±Г®Г§Г¤Г Г­ГЁГҐ ГІГ ГЎГ«ГЁГ¶Г» Г¤Г«Гї Г§Г ГЇГ°Г®Г±Г®Гў
 		create view new_table as with Search as(select ROW_NUMBER() over (ORDER BY (SELECT NULL)) row_n, * from for_search),
 		Result as(select ROW_NUMBER() over (ORDER BY (SELECT NULL)) as row_n, *  from results_of_search)
 		select Address_City,Address_Region,Material_of_bearing_walls,Floor_of_house from Search f full outer join Result r on f.row_n = r.row_n
